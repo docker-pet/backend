@@ -23,4 +23,4 @@ COPY --from=builder /app/backend /app/backend
 
 EXPOSE 80
 
-CMD ["/app/backend", "serve", "--http=\"0.0.0.0:80\""]
+CMD ["/app/backend", "serve", "--http=0.0.0.0:80"]
