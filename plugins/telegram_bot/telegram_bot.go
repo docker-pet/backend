@@ -1,4 +1,4 @@
-package telegram_auth
+package telegram_bot
 
 import (
 	"fmt"

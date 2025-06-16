@@ -36,3 +36,6 @@ pb_data/
 
 # build
 backend
+
+# lampa configs
+lampa/

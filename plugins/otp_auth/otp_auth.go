@@ -1,4 +1,4 @@
-package telegram_auth
+package otp_auth
 
 import (
 	"crypto/rand"

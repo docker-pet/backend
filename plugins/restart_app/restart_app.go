@@ -1,4 +1,4 @@
-package telegram_auth
+package restart_app
 
 import (
 	"fmt"

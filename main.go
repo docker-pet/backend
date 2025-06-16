@@ -10,6 +10,7 @@ import (
 	"github.com/pocketbase/pocketbase/plugins/migratecmd"
 
 	_ "github.com/docker-pet/backend/migrations"
+	lampaPlugin "github.com/docker-pet/backend/plugins/lampa"
 	restartAppPlugin "github.com/docker-pet/backend/plugins/restart_app"
 	otpAuthPlugin "github.com/docker-pet/backend/plugins/otp_auth"
 	telegramAuthPlugin "github.com/docker-pet/backend/plugins/telegram_auth"
@@ -27,6 +28,9 @@ func main() {
 
 	// App restart on configuration update
 	restartAppPlugin.Register(app, &restartAppPlugin.Options{})
+
+	// Lampa plugin
+	lampaPlugin.Register(app, &lampaPlugin.Options{})
 
 	// Setup telegram mini apps auth
 	authPlugin := telegramAuthPlugin.Register(app, &telegramAuthPlugin.Options{

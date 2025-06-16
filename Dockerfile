@@ -21,6 +21,6 @@ WORKDIR /app
 # Copy the binary from builder
 COPY --from=builder /app/backend /app/backend
 
-EXPOSE 8090
+EXPOSE 80
 
-CMD ["/app/backend", "serve"]
+CMD ["/app/backend", "serve", "--http=\"0.0.0.0:80\""]

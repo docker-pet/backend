@@ -3,6 +3,7 @@ package migrations
 import (
 	"github.com/pocketbase/pocketbase/core"
 	m "github.com/pocketbase/pocketbase/migrations"
+	"github.com/pocketbase/pocketbase/tools/security"
 	"github.com/pocketbase/pocketbase/tools/types"
 )
 
@@ -19,12 +20,38 @@ func init() {
 		// Fields
 		collection.Fields.Add(
 			&core.BoolField{
-				Name:    "enabled",
-				Required: false,
+				Name:     "dlnaEnabled",
 			},
-            &core.URLField{
-                Name:     "link",
+			&core.BoolField{
+				Name:     "sisiEnabled",
+			},
+			&core.BoolField{
+				Name:     "tmdbProxyEnabled",
+			},
+			&core.BoolField{
+				Name:     "torrServerEnabled",
+			},
+			&core.BoolField{
+				Name:     "serverProxyEnabled",
+			},
+			&core.BoolField{
+				Name:     "cubEnabled",
+			},
+			&core.BoolField{
+				Name:     "tracksEnabled",
+			},
+			&core.BoolField{
+				Name:     "onlineEnabled",
+			},
+            &core.TextField{
+                Name:     "adminPassword",
                 Required: true,
+				Hidden:   true,
+            },
+            &core.JSONField{
+                Name:     "configInit",
+                Required: false,
+				Hidden: true,
             },
 		)
 
@@ -36,9 +63,21 @@ func init() {
         // Add first record
 		record := core.NewRecord(collection)
 
-		// Set default values
-        record.Set("enabled", true)
-        record.Set("link", "https://github.com/immisterio/Lampac")
+		// Flags
+		record.Set("dlnaEnabled", false)
+		record.Set("sisiEnabled", true)
+		record.Set("tmdbProxyEnabled", true)
+		record.Set("torrServerEnabled", false)
+		record.Set("serverProxyEnabled", true)
+		record.Set("cubEnabled", true)
+		record.Set("tracksEnabled", false)
+		record.Set("onlineEnabled", true)
+
+		// Init config
+        record.Set("configInit", `{}`)
+        
+		// Password
+		record.Set("adminPassword", security.RandomString(30))
 
         return app.Save(record)
 	}, func(app core.App) error {
