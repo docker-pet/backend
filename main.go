@@ -29,16 +29,13 @@ func main() {
 	// App restart on configuration update
 	restartAppPlugin.Register(app, &restartAppPlugin.Options{})
 
-	// Lampa plugin
-	lampaPlugin.Register(app, &lampaPlugin.Options{})
-
 	// Setup telegram mini apps auth
-	authPlugin := telegramAuthPlugin.Register(app, &telegramAuthPlugin.Options{
+	authPluginInstance := telegramAuthPlugin.Register(app, &telegramAuthPlugin.Options{
 		CollectionKey: "users",
 	})
 
 	// OTP Auth
-	otpAuthPlugin.Register(app, &otpAuthPlugin.Options{
+	otpAuthPluginInstance := otpAuthPlugin.Register(app, &otpAuthPlugin.Options{
 		AuthVerifyInterval:       time.Minute * 7,
 		Expiration:               time.Minute * 5,
 		CleanupInterval:          time.Minute * 10,
@@ -47,10 +44,15 @@ func main() {
 
 	// Setup telegram bot
 	telegramBotPlugin.Register(app, &telegramBotPlugin.Options{
-		AuthPlugin: authPlugin,
+		AuthPlugin: authPluginInstance,
 		CronExpr:   "*/15 * * * *",
 		CronUsersPerRun: 10,
 		CronUserSyncInterval: time.Minute * 60,
+	})
+
+	// Lampa plugin
+	lampaPlugin.Register(app, &lampaPlugin.Options{
+		AuthPlugin: otpAuthPluginInstance,
 	})
 
     if err := app.Start(); err != nil {
