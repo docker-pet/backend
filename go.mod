@@ -8,6 +8,7 @@ require (
 	github.com/pocketbase/dbx v1.11.0
 	github.com/pocketbase/pocketbase v0.28.3
 	github.com/telegram-mini-apps/init-data-golang v1.5.0
+	github.com/zmwangx/debounce v1.0.0
 	gopkg.in/telebot.v4 v4.0.0-beta.5
 	resty.dev/v3 v3.0.0-beta.3
 )
