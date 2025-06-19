@@ -276,6 +276,7 @@ func (p *Plugin) doUpdateConfigs() {
 		users[i] = map[string]interface{}{
 			"id":  u.GetString("authKey"),
 			"ban": u.GetBool("disabled"),
+			"expires": "2040-01-01T00:00:00",
 		}
 	}
 	configInitObj["accsdb"] = map[string]interface{}{
