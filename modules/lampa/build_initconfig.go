@@ -63,7 +63,7 @@ func (m *LampaModule) BuildInitConfig() {
 	container.SetP(5, "serverproxy.buffering.millisecondsTimeout")
 
 	// Cub
-	container.SetP(m.LampaConfig().CubEnabled(), "cub")
+	container.SetP(m.LampaConfig().CubEnabled(), "cub.enable")
 
 	// AccessDB
 	users, err := m.GetAllLampaUsers()
