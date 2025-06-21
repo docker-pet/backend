@@ -9,53 +9,83 @@ import (
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/plugins/migratecmd"
 
+	"github.com/docker-pet/backend/core"
 	_ "github.com/docker-pet/backend/migrations"
-	lampaPlugin "github.com/docker-pet/backend/plugins/lampa"
-	restartAppPlugin "github.com/docker-pet/backend/plugins/restart_app"
-	otpAuthPlugin "github.com/docker-pet/backend/plugins/otp_auth"
-	telegramAuthPlugin "github.com/docker-pet/backend/plugins/telegram_auth"
-	telegramBotPlugin "github.com/docker-pet/backend/plugins/telegram_bot"
+	"github.com/docker-pet/backend/modules/app_config"
+	"github.com/docker-pet/backend/modules/lampa"
+	"github.com/docker-pet/backend/modules/otp_auth"
+	"github.com/docker-pet/backend/modules/outline"
+	"github.com/docker-pet/backend/modules/telegram_bot"
+	"github.com/docker-pet/backend/modules/telegram_miniapp"
+	"github.com/docker-pet/backend/modules/users"
 )
 
 func main() {
-    app := pocketbase.New()
-    isGoRun := strings.HasPrefix(os.Args[0], os.TempDir())
+	app := pocketbase.New()
+	isGoRun := strings.HasPrefix(os.Args[0], os.TempDir())
 
 	// Migrations
-    migratecmd.MustRegister(app, app.RootCmd, migratecmd.Config{
-        Automigrate: isGoRun,
-    })
-
-	// App restart on configuration update
-	restartAppPlugin.Register(app, &restartAppPlugin.Options{})
-
-	// Setup telegram mini apps auth
-	authPluginInstance := telegramAuthPlugin.Register(app, &telegramAuthPlugin.Options{
-		CollectionKey: "users",
+	migratecmd.MustRegister(app, app.RootCmd, migratecmd.Config{
+		Automigrate: isGoRun,
 	})
 
-	// OTP Auth
-	otpAuthPluginInstance := otpAuthPlugin.Register(app, &otpAuthPlugin.Options{
-		AuthVerifyInterval:       time.Minute * 7,
-		Expiration:               time.Minute * 5,
-		CleanupInterval:          time.Minute * 10,
-		MaxPinGenerationAttempts: 10,
+	// HTTP Client
+	httpClient := core.NewHttpClient()
+	defer httpClient.Close()
+
+	// Modules
+	ctx := &core.AppContext{
+		App:        app,
+		HttpClient: httpClient,
+	}
+
+	core.RegisterModule(&app_config.AppConfigModule{}, &app_config.Config{})
+
+	core.RegisterModule(&users.UsersModule{}, &users.Config{})
+
+	core.RegisterModule(&otp_auth.OtpAuthModule{}, &otp_auth.Config{
+		SessionVerifyInterval:             time.Minute * 7,
+		AuthSessionLifetime:               time.Minute * 5,
+		ExpiredAuthSessionCleanupInterval: time.Minute * 15,
+		MaxPinGenerationAttempts:          10,
 	})
 
-	// Setup telegram bot
-	telegramBotPlugin.Register(app, &telegramBotPlugin.Options{
-		AuthPlugin: authPluginInstance,
-		CronExpr:   "*/15 * * * *",
-		CronUsersPerRun: 10,
-		CronUserSyncInterval: time.Minute * 60,
+	core.RegisterModule(&lampa.LampaModule{}, &lampa.Config{
+		StoragePath: "./generated/lampa",
 	})
 
-	// Lampa plugin
-	lampaPlugin.Register(app, &lampaPlugin.Options{
-		AuthPlugin: otpAuthPluginInstance,
+	core.RegisterModule(&telegram_bot.TelegramBotModule{}, &telegram_bot.Config{
+		CronUserSyncExpression: "*/15 * * * *",
+		CronUserSyncInterval:   time.Minute * 60,
+		CronUsersPerSync:       10,
 	})
 
-    if err := app.Start(); err != nil {
-        log.Fatal(err)
-    }
+	core.RegisterModule(&telegram_miniapp.TelegramMiniappModule{}, &telegram_miniapp.Config{
+		AuthTokenLifetime: time.Hour * 12,
+	})
+
+	core.RegisterModule(&outline.OutlineModule{}, &outline.Config{
+		OutlineStoragePath: "./generated/outline",
+		OutlineCipher:      "chacha20-ietf-poly1305",
+
+		PrometheusStoragePath:       "./generated/prometheus",
+		PrometheusJobName:           "outline",
+		PrometheusJobManagedByLabel: "github.com/docker-pet",
+
+		CaddyBasicAuthUsername:     "service",
+		CaddyCloudflareApiToken:    os.Getenv("CLOUDFLARE_API_TOKEN"),
+		CaddyRefreshCronExpression: "*/5 * * * *",
+
+		TokenStoreSlidingTTL:      time.Hour * 4,
+		TokenStoreAbsoluteTTL:     time.Hour * 48,
+		TokenStoreCleanupInterval: time.Hour * 8,
+	})
+
+	// Star app
+	err := core.InitModules(ctx)
+	if err != nil {
+		log.Fatal(err)
+	} else if err := app.Start(); err != nil {
+		log.Fatal(err)
+	}
 }

@@ -44,8 +44,8 @@ func init() {
 		)
 
 		// Indexes
-		collection.AddIndex("idx_auth_key", true, "authKey", "")
-		collection.AddIndex("idx_user_key", true, "user", "")
+		collection.AddIndex("idx_lampa_users__auth_key", true, "authKey", "")
+		collection.AddIndex("idx_lampa_users__user_key", true, "user", "")
 
 		// Save
 		if err := app.Save(collection); err != nil {

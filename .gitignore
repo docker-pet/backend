@@ -37,5 +37,5 @@ go.work.sum
 # build
 /backend
 
-# lampa configs
-/lampa/
+# generated configs
+/generated/
