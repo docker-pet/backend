@@ -41,7 +41,7 @@ func (m *TelegramBotModule) Init(ctx *core.AppContext, cfg any) error {
 
 	m.Ctx.App.OnServe().BindFunc(func(e *pbCore.ServeEvent) error {
 		// Initialize bot
-		bot, err := m.newBot()
+		bot, err := m.newBot(e)
 		if err != nil {
 			m.Logger.Warn(
 				"Failed to initialize Telegram bot",

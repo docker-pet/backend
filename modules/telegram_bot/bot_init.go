@@ -8,7 +8,7 @@ import (
 	tele "gopkg.in/telebot.v4"
 )
 
-func (m *TelegramBotModule) newBot() (*tele.Bot, error) {
+func (m *TelegramBotModule) newBot(e *core.ServeEvent) (*tele.Bot, error) {
 	endpointPath := fmt.Sprintf("/api/telegram_bot/%s", m.appConfig.AppConfig().TelegramBotToken())
 	endpointUrl := fmt.Sprintf("https://%s%s", m.appConfig.AppConfig().AppDomain(), endpointPath)
 
@@ -45,13 +45,9 @@ func (m *TelegramBotModule) newBot() (*tele.Bot, error) {
 	}
 
 	// HTTP Endpoint
-	m.Ctx.App.OnServe().BindFunc(func(e *core.ServeEvent) error {
-		e.Router.POST(endpointPath, func(ctx *core.RequestEvent) error {
-			webhook.ServeHTTP(ctx.Response, ctx.Request)
-			return ctx.JSON(http.StatusOK, map[string]bool{"ok": true})
-		})
-
-		return e.Next()
+	e.Router.POST(endpointPath, func(ctx *core.RequestEvent) error {
+		webhook.ServeHTTP(ctx.Response, ctx.Request)
+		return ctx.JSON(http.StatusOK, map[string]bool{"ok": true})
 	})
 
 	// Initialized

@@ -11,8 +11,10 @@ import (
 )
 
 type Config struct {
-	OutlineStoragePath string
-	OutlineCipher      string
+	OutlineStoragePath        string
+	OutlineCipher             string
+	OutlineTechnicalKeyName   string
+	OutlineTechnicalKeySecret string
 
 	PrometheusStoragePath       string
 	PrometheusJobName           string
@@ -52,6 +54,8 @@ func (m *OutlineModule) Init(ctx *core.AppContext, cfg any) error {
 		m.Config.TokenStoreSlidingTTL,
 		m.Config.TokenStoreAbsoluteTTL,
 		m.Config.TokenStoreCleanupInterval,
+		m.Config.OutlineTechnicalKeyName,
+		m.Config.OutlineTechnicalKeySecret,
 	)
 
 	// Generate metrics proxy secret if not set

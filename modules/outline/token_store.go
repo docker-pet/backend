@@ -26,15 +26,21 @@ type TokenStore struct {
 
 	// onChange listeners
 	onChangeListeners []func(serverId string)
+
+	TechnicalKeyName   string
+	TechnicalKeySecret string
 }
 
 // NewTokenStore initializes a token store with cleanup.
-func NewTokenStore(slidingTTL, absoluteTTL, cleanupInterval time.Duration) *TokenStore {
+func NewTokenStore(slidingTTL, absoluteTTL, cleanupInterval time.Duration, TechnicalKeyName, TechnicalKeySecret string) *TokenStore {
 	s := &TokenStore{
 		tokens:       make(map[string]map[string]*Token),
 		slidingTTL:   slidingTTL,
 		absoluteTTL:  absoluteTTL,
 		cleanupIntvl: cleanupInterval,
+
+		TechnicalKeyName:   TechnicalKeyName,
+		TechnicalKeySecret: TechnicalKeySecret,
 	}
 	go s.cleanupLoop()
 	return s
@@ -101,6 +107,15 @@ func (s *TokenStore) GetAllByServer(serverId string) []*Token {
 	for _, t := range s.tokens[serverId] {
 		result = append(result, t)
 	}
+
+	// Add technical token for serverId (Without a token, Outline won’t start)
+	result = append(result, &Token{
+		UserId:     s.TechnicalKeyName,
+		Token:      s.TechnicalKeySecret,
+		CreatedAt:  time.Now(),
+		LastUsedAt: time.Now(),
+	})
+
 	return result
 }
 

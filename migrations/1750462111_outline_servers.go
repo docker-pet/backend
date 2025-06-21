@@ -14,8 +14,8 @@ func init() {
 		collection := core.NewBaseCollection("outline_servers")
 
 		// Rules
-		collection.ListRule = types.Pointer("@request.auth.role = 'admin'")
-		collection.ViewRule = types.Pointer("@request.auth.role = 'admin'")
+		collection.ListRule = types.Pointer("@request.auth.role = 'user'")
+		collection.ViewRule = types.Pointer("@request.auth.role = 'user'")
 		collection.ManageRule = types.Pointer("@request.auth.role = 'admin'")
 
 		// Fields

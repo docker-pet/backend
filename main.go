@@ -8,6 +8,7 @@ import (
 
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/plugins/migratecmd"
+	"github.com/pocketbase/pocketbase/tools/security"
 
 	"github.com/docker-pet/backend/core"
 	_ "github.com/docker-pet/backend/migrations"
@@ -65,8 +66,10 @@ func main() {
 	})
 
 	core.RegisterModule(&outline.OutlineModule{}, &outline.Config{
-		OutlineStoragePath: "./generated/outline",
-		OutlineCipher:      "chacha20-ietf-poly1305",
+		OutlineStoragePath:        "./generated/outline",
+		OutlineCipher:             "chacha20-ietf-poly1305",
+		OutlineTechnicalKeyName:   "service",
+		OutlineTechnicalKeySecret: security.RandomString(32),
 
 		PrometheusStoragePath:       "./generated/prometheus",
 		PrometheusJobName:           "outline",
