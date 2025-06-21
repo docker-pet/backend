@@ -51,6 +51,9 @@ func (m *LampaModule) BuildInitConfig() {
 	container.SetP(true, "tmdb.useproxy")
 	container.SetP(true, "tmdb.useproxystream")
 
+	// Cub
+	container.SetP(m.LampaConfig().CubEnabled(), "cub.enable")
+
 	// Server Proxy
 	container.SetP(m.LampaConfig().ServerProxyEnabled(), "serverproxy.enable")
 	container.SetP(false, "serverproxy.verifyip")
@@ -61,9 +64,6 @@ func (m *LampaModule) BuildInitConfig() {
 	container.SetP(8192, "serverproxy.buffering.rent")
 	container.SetP(3906, "serverproxy.buffering.length")
 	container.SetP(5, "serverproxy.buffering.millisecondsTimeout")
-
-	// Cub
-	container.SetP(m.LampaConfig().CubEnabled(), "cub.enable")
 
 	// AccessDB
 	users, err := m.GetAllLampaUsers()
