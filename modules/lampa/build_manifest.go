@@ -36,8 +36,7 @@ func (m *LampaModule) BuildManifest() {
 
 func appendManifest(container *gabs.Container, name string, enable bool, initspace string) {
 	obj := gabs.New()
-	obj.Set(name, "name")
-	obj.Set("dll", "type")
+	obj.Set(name, "dll")
 	obj.Set(enable, "enable")
 	if initspace != "" {
 		obj.Set(initspace, "initspace")
