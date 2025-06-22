@@ -22,12 +22,13 @@ type TelegramMiniappModule struct {
 	appConfig *app_config.AppConfigModule
 }
 
-func (m *TelegramMiniappModule) Name() string   { return "telegram_miniapp" }
-func (m *TelegramMiniappModule) Deps() []string { return []string{"users", "app_config"} }
-func (m *TelegramMiniappModule) Init(ctx *core.AppContext, cfg any) error {
+func (m *TelegramMiniappModule) Name() string                  { return "telegram_miniapp" }
+func (m *TelegramMiniappModule) Deps() []string                { return []string{"users", "app_config"} }
+func (m *TelegramMiniappModule) SetLogger(logger *slog.Logger) { m.Logger = logger }
+func (m *TelegramMiniappModule) Init(ctx *core.AppContext, logger *slog.Logger, cfg any) error {
 	m.Ctx = ctx
 	m.Config = cfg.(*Config)
-	m.Logger = ctx.App.Logger().WithGroup(m.Name())
+	m.Logger = logger
 	m.users = m.Ctx.Modules["users"].(*users.UsersModule)
 	m.appConfig = m.Ctx.Modules["app_config"].(*app_config.AppConfigModule)
 

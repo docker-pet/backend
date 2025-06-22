@@ -27,12 +27,13 @@ type OtpAuthModule struct {
 	keychain  *KeyChain
 }
 
-func (m *OtpAuthModule) Name() string   { return "otp_auth" }
-func (m *OtpAuthModule) Deps() []string { return []string{"users", "app_config"} }
-func (m *OtpAuthModule) Init(ctx *core.AppContext, cfg any) error {
+func (m *OtpAuthModule) Name() string                  { return "otp_auth" }
+func (m *OtpAuthModule) Deps() []string                { return []string{"users", "app_config"} }
+func (m *OtpAuthModule) SetLogger(logger *slog.Logger) { m.Logger = logger }
+func (m *OtpAuthModule) Init(ctx *core.AppContext, logger *slog.Logger, cfg any) error {
 	m.Ctx = ctx
 	m.Config = cfg.(*Config)
-	m.Logger = ctx.App.Logger().WithGroup(m.Name())
+	m.Logger = logger
 	m.appConfig = m.Ctx.Modules["app_config"].(*app_config.AppConfigModule)
 	m.users = m.Ctx.Modules["users"].(*users.UsersModule)
 	m.keychain = NewKeyChain(&KeyChainOptions{

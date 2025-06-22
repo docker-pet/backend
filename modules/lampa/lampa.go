@@ -23,12 +23,13 @@ type LampaModule struct {
 	currentLampaConfig *models.LampaConfig
 }
 
-func (m *LampaModule) Name() string   { return "lampa" }
-func (m *LampaModule) Deps() []string { return []string{"users", "app_config"} }
-func (m *LampaModule) Init(ctx *core.AppContext, cfg any) error {
+func (m *LampaModule) Name() string                  { return "lampa" }
+func (m *LampaModule) Deps() []string                { return []string{"users", "app_config"} }
+func (m *LampaModule) SetLogger(logger *slog.Logger) { m.Logger = logger }
+func (m *LampaModule) Init(ctx *core.AppContext, logger *slog.Logger, cfg any) error {
 	m.Ctx = ctx
 	m.Config = cfg.(*Config)
-	m.Logger = ctx.App.Logger().WithGroup(m.Name())
+	m.Logger = logger
 	m.users = m.Ctx.Modules["users"].(*users.UsersModule)
 	m.appConfig = m.Ctx.Modules["app_config"].(*app_config.AppConfigModule)
 

@@ -45,9 +45,9 @@ func (m *LampaModule) watchConfigChanges() {
 		m.currentLampaConfig = ProxyLampaConfig(e.Record)
 		m.Logger.Info("Lampa config updated successfully")
 
-		m.BuildManifest()
-		m.BuildPassword()
-		buildInitConfigDebounced()
+		go m.BuildManifest()
+		go m.BuildPassword()
+		go buildInitConfigDebounced()
 
 		return nil
 	})
@@ -56,21 +56,21 @@ func (m *LampaModule) watchConfigChanges() {
 	m.Ctx.App.OnRecordAfterCreateSuccess("lampa_users").BindFunc(func(e *core.RecordEvent) error {
 		user := ProxyLampaUser(e.Record)
 		m.Logger.Info("Lampa user created", "UserId", user.UserId())
-		buildInitConfigDebounced()
+		go buildInitConfigDebounced()
 		return e.Next()
 	})
 
 	m.Ctx.App.OnRecordAfterDeleteSuccess("lampa_users").BindFunc(func(e *core.RecordEvent) error {
 		user := ProxyLampaUser(e.Record)
 		m.Logger.Info("Lampa user deleted", "UserId", user.UserId())
-		buildInitConfigDebounced()
+		go buildInitConfigDebounced()
 		return e.Next()
 	})
 
 	m.Ctx.App.OnRecordAfterUpdateSuccess("lampa_users").BindFunc(func(e *core.RecordEvent) error {
 		user := ProxyLampaUser(e.Record)
 		m.Logger.Info("Lampa user updated", "UserId", user.UserId())
-		buildInitConfigDebounced()
+		go buildInitConfigDebounced()
 		return e.Next()
 	})
 

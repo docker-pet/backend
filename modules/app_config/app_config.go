@@ -17,12 +17,13 @@ type AppConfigModule struct {
 	currentConfig *models.AppConfig
 }
 
-func (m *AppConfigModule) Name() string   { return "app_config" }
-func (m *AppConfigModule) Deps() []string { return nil }
-func (m *AppConfigModule) Init(ctx *core.AppContext, cfg any) error {
+func (m *AppConfigModule) Name() string                  { return "app_config" }
+func (m *AppConfigModule) Deps() []string                { return nil }
+func (m *AppConfigModule) SetLogger(logger *slog.Logger) { m.Logger = logger }
+func (m *AppConfigModule) Init(ctx *core.AppContext, logger *slog.Logger, cfg any) error {
 	m.Ctx = ctx
 	m.Config = cfg.(*Config)
-	m.Logger = ctx.App.Logger().WithGroup(m.Name())
+	m.Logger = logger
 
 	m.watchChanges()
 

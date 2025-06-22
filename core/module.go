@@ -2,12 +2,15 @@ package core
 
 import (
 	"fmt"
+	"log/slog"
+    pbCore "github.com/pocketbase/pocketbase/core"
 )
 
 type Module interface {
 	Name() string
 	Deps() []string
-	Init(ctx *AppContext, cfg any) error
+	Init(ctx *AppContext, logger *slog.Logger, cfg any) error
+	SetLogger(logger *slog.Logger)
 }
 
 type ModuleEntry struct {
@@ -24,6 +27,18 @@ func RegisterModule(m Module, config any) {
 func InitModules(ctx *AppContext) error {
 	visited := map[string]bool{}
 
+    ctx.App.OnBootstrap().BindFunc(func(e *pbCore.BootstrapEvent) error {
+        if err := e.Next(); err != nil {
+            return err
+        }
+
+		for name, entry := range moduleRegistry {
+			entry.Module.SetLogger(ctx.App.Logger().WithGroup(name))
+		}
+
+		return nil
+    })
+
 	var initModule func(name string) error
 	initModule = func(name string) error {
 		if visited[name] {
@@ -38,7 +53,7 @@ func InitModules(ctx *AppContext) error {
 				return err
 			}
 		}
-		if err := entry.Module.Init(ctx, entry.Config); err != nil {
+		if err := entry.Module.Init(ctx, ctx.App.Logger().WithGroup(name), entry.Config); err != nil {
 			return err
 		}
 		if ctx.Modules == nil {

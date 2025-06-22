@@ -28,12 +28,13 @@ type TelegramBotModule struct {
 	Bot *tele.Bot
 }
 
-func (m *TelegramBotModule) Name() string   { return "telegram_bot" }
-func (m *TelegramBotModule) Deps() []string { return []string{"users", "app_config"} }
-func (m *TelegramBotModule) Init(ctx *core.AppContext, cfg any) error {
+func (m *TelegramBotModule) Name() string                  { return "telegram_bot" }
+func (m *TelegramBotModule) Deps() []string                { return []string{"users", "app_config"} }
+func (m *TelegramBotModule) SetLogger(logger *slog.Logger) { m.Logger = logger }
+func (m *TelegramBotModule) Init(ctx *core.AppContext, logger *slog.Logger, cfg any) error {
 	m.Ctx = ctx
 	m.Config = cfg.(*Config)
-	m.Logger = ctx.App.Logger().WithGroup(m.Name())
+	m.Logger = logger
 	m.appConfig = m.Ctx.Modules["app_config"].(*app_config.AppConfigModule)
 	m.users = m.Ctx.Modules["users"].(*users.UsersModule)
 

@@ -40,12 +40,13 @@ type OutlineModule struct {
 	tokenStore *TokenStore
 }
 
-func (m *OutlineModule) Name() string   { return "outline" }
-func (m *OutlineModule) Deps() []string { return []string{"users", "app_config"} }
-func (m *OutlineModule) Init(ctx *core.AppContext, cfg any) error {
+func (m *OutlineModule) Name() string                  { return "outline" }
+func (m *OutlineModule) Deps() []string                { return []string{"users", "app_config"} }
+func (m *OutlineModule) SetLogger(logger *slog.Logger) { m.Logger = logger }
+func (m *OutlineModule) Init(ctx *core.AppContext, logger *slog.Logger, cfg any) error {
 	m.Ctx = ctx
 	m.Config = cfg.(*Config)
-	m.Logger = ctx.App.Logger().WithGroup(m.Name())
+	m.Logger = logger
 	m.users = m.Ctx.Modules["users"].(*users.UsersModule)
 	m.appConfig = m.Ctx.Modules["app_config"].(*app_config.AppConfigModule)
 	m.tokenStore = NewTokenStore(
