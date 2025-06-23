@@ -56,18 +56,6 @@ func proxyServerList(records []*core.Record, err error) ([]*models.OutlineServer
 
 func (m *OutlineModule) formatJobDomain(server *models.OutlineServer) string {
 	domain := server.OverrideDomain()
-	if domain == "" {
-		domain = fmt.Sprintf("%s.%s", server.Slug(), m.appConfig.AppConfig().AppDomain())
-	}
-
-	return domain
-}
-
-func (m *OutlineModule) formatConnectDomain(server *models.OutlineServer, user *models.User) string {
-	domain := server.OverrideDomain()
-	if user.OutlineReverseServerEnabled() && server.ReverseDomain() != "" {
-		domain = server.ReverseDomain()
-	}
 
 	if domain != "" && !strings.Contains(domain, ".") {
     	domain = fmt.Sprintf("%s.%s", domain, m.appConfig.AppConfig().AppDomain())
@@ -78,6 +66,27 @@ func (m *OutlineModule) formatConnectDomain(server *models.OutlineServer, user *
 	}
 
 	return domain
+}
+
+func (m *OutlineModule) formatReverseDomain(server *models.OutlineServer) string {
+	if server.ReverseDomain() == "" {
+		return ""
+	}
+
+	domain := server.ReverseDomain()
+	if domain != "" && !strings.Contains(domain, ".") {
+    	domain = fmt.Sprintf("%s.%s", domain, m.appConfig.AppConfig().AppDomain())
+	}
+
+	return domain
+}
+
+func (m *OutlineModule) formatConnectDomain(server *models.OutlineServer, user *models.User) string {
+	if user.OutlineReverseServerEnabled() && server.ReverseDomain() != "" {
+		return m.formatReverseDomain(server)
+	}
+
+	return m.formatJobDomain(server)
 }
 
 func ProxyOutlineServer(record *core.Record) *models.OutlineServer {

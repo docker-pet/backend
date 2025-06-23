@@ -306,6 +306,14 @@ func (m *OutlineModule) GenerateBasicCaddyConfig(server *models.OutlineServer) (
 			server.SetSyncRemoteConfig(config)
 		}
 
+		// Domains
+		domains := fmt.Sprintf(`"%s"`, m.formatJobDomain(server))
+		reverseDomain := m.formatReverseDomain(server)
+		if reverseDomain != "" {
+			domains += fmt.Sprintf(`, "%s"`, reverseDomain)
+		}
+
+
 		return []byte(fmt.Sprintf(`{
 			"admin": {
               "listen": "unix//outline_generated/admin.sock"
@@ -323,9 +331,7 @@ func (m *OutlineModule) GenerateBasicCaddyConfig(server *models.OutlineServer) (
                       {
                         "match": [
                           {
-                            "host": [
-                              "%s"
-                            ]
+                            "host": ["%s"]
                           }
                         ],
                         "handle": [
@@ -395,7 +401,7 @@ func (m *OutlineModule) GenerateBasicCaddyConfig(server *models.OutlineServer) (
                 }
               }
             }
-          }`, portsJson, m.formatJobDomain(server), servicePath, serviceUsername, servicePassword, servicePath)), needToSave
+          }`, portsJson, domains, servicePath, serviceUsername, servicePassword, servicePath)), needToSave
 	}
 
 	return []byte("{}"), false
@@ -475,6 +481,10 @@ func (m *OutlineModule) generateWebsocket2layer4Route(server *models.OutlineServ
 	matchHostItem := gabs.New()
 	matchHostItem.Array()
 	matchHostItem.ArrayAppend(m.formatJobDomain(server))
+	reverseDomain := m.formatReverseDomain(server)
+	if reverseDomain != "" {
+		matchHostItem.ArrayAppend(reverseDomain)
+	}
 	matchHost.SetP(matchHostItem, "host")
 	match.ArrayAppend(matchHost)
 
