@@ -20,6 +20,10 @@ func init() {
 			},
 		)
 
+		if err := app.Save(usersCollection); err != nil {
+			return err
+		}
+
 		// Outline servers collection
 		outlineCollection, err := app.FindCollectionByNameOrId("outline_servers")
 		if err != nil {
