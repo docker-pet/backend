@@ -7,7 +7,9 @@ import (
 	"github.com/docker-pet/backend/models"
 )
 
-type Config struct{}
+type Config struct {
+	Version models.AppVersion
+}
 
 type AppConfigModule struct {
 	Ctx    *core.AppContext
@@ -25,6 +27,7 @@ func (m *AppConfigModule) Init(ctx *core.AppContext, logger *slog.Logger, cfg an
 	m.Config = cfg.(*Config)
 	m.Logger = logger
 
+	m.setupVersionSync()
 	m.watchChanges()
 
 	m.Logger.Info("App config module initialized", "Config", m.Config)

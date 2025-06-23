@@ -12,6 +12,7 @@ import (
 
 	"github.com/docker-pet/backend/core"
 	_ "github.com/docker-pet/backend/migrations"
+	"github.com/docker-pet/backend/models"
 	"github.com/docker-pet/backend/modules/app_config"
 	"github.com/docker-pet/backend/modules/lampa"
 	"github.com/docker-pet/backend/modules/otp_auth"
@@ -19,6 +20,12 @@ import (
 	"github.com/docker-pet/backend/modules/telegram_bot"
 	"github.com/docker-pet/backend/modules/telegram_miniapp"
 	"github.com/docker-pet/backend/modules/users"
+)
+
+var (
+	Version   = "dev"
+	Commit    = "none"
+	BuildTime = "unknown"
 )
 
 func main() {
@@ -40,7 +47,13 @@ func main() {
 		HttpClient: httpClient,
 	}
 
-	core.RegisterModule(&app_config.AppConfigModule{}, &app_config.Config{})
+	core.RegisterModule(&app_config.AppConfigModule{}, &app_config.Config{
+		Version: models.AppVersion{
+			Version:   Version,
+			Commit:    Commit,
+			BuildTime: BuildTime,
+		},
+	})
 
 	core.RegisterModule(&users.UsersModule{}, &users.Config{})
 
@@ -75,7 +88,7 @@ func main() {
 		PrometheusJobName:           "outline",
 		PrometheusJobManagedByLabel: "github.com/docker-pet",
 
-		CaddyCloudflareApiToken:    os.Getenv("CLOUDFLARE_API_TOKEN"),
+		CaddyCloudflareApiToken: os.Getenv("CLOUDFLARE_API_TOKEN"),
 
 		TokenStoreSlidingTTL:      time.Hour * 4,
 		TokenStoreAbsoluteTTL:     time.Hour * 48,

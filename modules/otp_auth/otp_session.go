@@ -64,6 +64,11 @@ func (m *OtpAuthModule) registerOtpSessionEndpoint() {
 				claims.UserRole = keychainUser.UserRole
 				claims.ValidationDate = time.Now()
 				m.fillCookie(e, *claims)
+
+				container := gabs.New()
+				container.Set(claims.UserId, "userId")
+				container.Set(claims.DeviceName, "deviceName")
+				return e.JSON(http.StatusOK, container.Data())
 			}
 
 			// Response

@@ -59,6 +59,7 @@ func (m *TelegramBotModule) Init(ctx *core.AppContext, logger *slog.Logger, cfg 
 		m.useOnChatJoinRequest()
 		m.useOnMyChatMember()
 		m.useStartCommand()
+		m.appConfig.SetBotUsername(m.Bot.Me.Username)
 
 		// Start
 		go m.Bot.Start()

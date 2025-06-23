@@ -1,6 +1,8 @@
 package models
 
 import (
+	"encoding/json"
+
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/tools/security"
 )
@@ -59,6 +61,14 @@ func (a *AppConfig) SetTelegramPremiumChannelInviteLink(value string) {
 	a.Set("telegramPremiumChannelInviteLink", value)
 }
 
+func (a *AppConfig) SupportLink() string {
+	return a.GetString("supportLink")
+}
+
+func (a *AppConfig) SetSupportLink(value string) {
+	a.Set("supportLink", value)
+}
+
 func (a *AppConfig) AuthSecret() string {
 	return a.GetString("authSecret")
 }
@@ -72,7 +82,7 @@ func (a *AppConfig) AuthCookieName() string {
 }
 
 func (a *AppConfig) GenerateAuthCookieName(value string) {
-	a.Set("authCookieName", "auth_" + security.RandomString(12))
+	a.Set("authCookieName", "auth_"+security.RandomString(12))
 }
 
 func (a *AppConfig) AuthPinLength() int {
@@ -81,4 +91,26 @@ func (a *AppConfig) AuthPinLength() int {
 
 func (a *AppConfig) SetAuthPinLength(value int) {
 	a.Set("authPinLength", value)
+}
+
+func (a *AppConfig) Version() *AppVersion {
+	var version AppVersion
+	a.UnmarshalJSONField("version", &version)
+	return &version
+}
+
+func (a *AppConfig) SetVersion(value *AppVersion) {
+	data, err := json.MarshalIndent(value, "", "  ")
+	if err != nil {
+		panic(err)
+	}
+	a.Set("version", data)
+}
+
+func (a *AppConfig) BotUsername() string {
+	return a.GetString("botUsername")
+}
+
+func (a *AppConfig) SetBotUsername(value string) {
+	a.Set("botUsername", value)
 }
