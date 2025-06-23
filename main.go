@@ -90,9 +90,9 @@ func main() {
 
 		CaddyCloudflareApiToken: os.Getenv("CLOUDFLARE_API_TOKEN"),
 
-		TokenStoreSlidingTTL:      time.Hour * 4,
-		TokenStoreAbsoluteTTL:     time.Hour * 48,
-		TokenStoreCleanupInterval: time.Hour * 8,
+		TokenStoreSlidingTTL:      time.Hour * 24 * 3,
+		TokenStoreAbsoluteTTL:     time.Hour * 24 * 6,
+		TokenStoreCleanupInterval: time.Hour * 24 * 7,
 	})
 
 	// Star app
