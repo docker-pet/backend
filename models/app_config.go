@@ -114,3 +114,9 @@ func (a *AppConfig) BotUsername() string {
 func (a *AppConfig) SetBotUsername(value string) {
 	a.Set("botUsername", value)
 }
+
+func (a *AppConfig) AppTitle() string {
+	var title string
+	a.UnmarshalJSONField("appTitle", &title)
+	return title
+}

@@ -22,7 +22,7 @@ func (m *OutlineModule) registerOutlineConnectEndpoint() {
 	}
 
 	m.Ctx.App.OnServe().BindFunc(func(se *core.ServeEvent) error {
-		se.Router.Any("/api/outline/{userId}/{outlineSecret}", func(e *core.RequestEvent) error {
+		se.Router.GET("/api/outline/{userId}/{outlineSecret}", func(e *core.RequestEvent) error {
 			userId := e.Request.PathValue("userId")
 			outlineSecret := e.Request.PathValue("outlineSecret")
 
@@ -213,6 +213,17 @@ func (m *OutlineModule) registerOutlineConnectEndpoint() {
 			// Response
 			e.Response.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 			return e.Blob(http.StatusOK, "application/x-yaml", content)
+		})
+
+		se.Router.GET("/api/outline/redirect/{userId}/{outlineSecret}", func(e *core.RequestEvent) error {
+			url := fmt.Sprintf(
+				"ssconf://%s/api/outline/%s/%s#%s",
+				m.appConfig.AppConfig().AppDomain(),
+				e.Request.PathValue("userId"),
+				e.Request.PathValue("outlineSecret"),
+				url.PathEscape(m.appConfig.AppConfig().AppTitle()),
+			)
+			return e.Redirect(http.StatusMovedPermanently, url)
 		})
 
 		return se.Next()
