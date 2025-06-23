@@ -2,6 +2,7 @@ package outline
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/docker-pet/backend/models"
 	"github.com/pocketbase/dbx"
@@ -55,6 +56,23 @@ func proxyServerList(records []*core.Record, err error) ([]*models.OutlineServer
 
 func (m *OutlineModule) formatJobDomain(server *models.OutlineServer) string {
 	domain := server.OverrideDomain()
+	if domain == "" {
+		domain = fmt.Sprintf("%s.%s", server.Slug(), m.appConfig.AppConfig().AppDomain())
+	}
+
+	return domain
+}
+
+func (m *OutlineModule) formatConnectDomain(server *models.OutlineServer, user *models.User) string {
+	domain := server.OverrideDomain()
+	if user.OutlineReverseServerEnabled() && server.ReverseDomain() != "" {
+		domain = server.ReverseDomain()
+	}
+
+	if domain != "" && !strings.Contains(domain, ".") {
+    	domain = fmt.Sprintf("%s.%s", domain, m.appConfig.AppConfig().AppDomain())
+	}
+
 	if domain == "" {
 		domain = fmt.Sprintf("%s.%s", server.Slug(), m.appConfig.AppConfig().AppDomain())
 	}

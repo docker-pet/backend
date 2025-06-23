@@ -114,6 +114,14 @@ func (a *User) SetOutlinePrefixEnabled(enabled bool) {
 	a.Set("outlinePrefixEnabled", enabled)
 }
 
+func (a *User) OutlineReverseServerEnabled() bool {
+	return a.GetBool("outlineReverseServerEnabled")
+}
+
+func (a *User) SetOutlineReverseServerEnabled(enabled bool) {
+	a.Set("outlineReverseServerEnabled", enabled)
+}
+
 func (a *User) OutlineServer() string {
 	return a.GetString("outlineServer")
 }

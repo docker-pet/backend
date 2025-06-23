@@ -37,6 +37,12 @@ func (m *OutlineModule) registerSettingsEndpoint() {
 				return e.BadRequestError("field 'outlineServer' must be a string", nil)
 			}
 
+			// Reverse server
+			outlineReverseServerEnabled, ok := data.Path("outlineReverseServerEnabled").Data().(bool)
+			if !ok {
+				return e.BadRequestError("field 'outlineReverseServerEnabled' must be a bool", nil)
+			}
+
 			// Check server
 			// TODO: chech if server is active
 			if outlineServerId != "" {
@@ -48,6 +54,7 @@ func (m *OutlineModule) registerSettingsEndpoint() {
 
 			// Save settings
 			user.SetOutlinePrefixEnabled(outlinePrefixEnabled)
+			user.SetOutlineReverseServerEnabled(outlineReverseServerEnabled)
 			user.SetOutlineServer(outlineServerId)
 			if err := m.Ctx.App.Save(user); err != nil {
 				return e.InternalServerError("Failed to save user settings", err)

@@ -54,6 +54,14 @@ func (a *OutlineServer) SetOverrideDomain(value string) {
 	a.Set("overrideDomain", value)
 }
 
+func (a *OutlineServer) ReverseDomain() string {
+	return a.GetString("reverseDomain")
+}
+
+func (a *OutlineServer) SetReverseDomain(value string) {
+	a.Set("reverseDomain", value)
+}
+
 func (a *OutlineServer) SyncType() OutlineServerSyncType {
 	return OutlineServerSyncType(a.GetString("syncType"))
 }
