@@ -39,14 +39,16 @@ func (m *OutlineModule) registerSettingsEndpoint() {
 
 			// Check server
 			// TODO: chech if server is active
-			outlineServer, err := m.GetServerById(outlineServerId)
-			if err != nil {
-				return e.BadRequestError("server with specified ID not found", nil)
+			if outlineServerId != "" {
+				_, err := m.GetServerById(outlineServerId)
+				if err != nil {
+					return e.BadRequestError("server with specified ID not found", nil)
+				}
 			}
 
 			// Save settings
 			user.SetOutlinePrefixEnabled(outlinePrefixEnabled)
-			user.SetOutlineServer(outlineServer.Id)
+			user.SetOutlineServer(outlineServerId)
 			if err := m.Ctx.App.Save(user); err != nil {
 				return e.InternalServerError("Failed to save user settings", err)
 			}
