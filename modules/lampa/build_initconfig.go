@@ -47,7 +47,7 @@ func (m *LampaModule) BuildInitConfig() {
 	container.SetP(true, "LampaWeb.initPlugins.sync")
 
 	// TMDB
-	container.SetP(false, "tmdb.enable")
+	container.SetP(m.LampaConfig().TmdbProxyEnabled(), "tmdb.enable")
 	container.SetP(true, "tmdb.useproxy")
 	container.SetP(true, "tmdb.useproxystream")
 
