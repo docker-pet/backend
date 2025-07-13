@@ -6,6 +6,7 @@ import (
 
 	"github.com/docker-pet/backend/core"
 	"github.com/docker-pet/backend/modules/app_config"
+	"github.com/docker-pet/backend/modules/lampa"
 	"github.com/docker-pet/backend/modules/users"
 )
 
@@ -24,6 +25,7 @@ type OtpAuthModule struct {
 
 	appConfig *app_config.AppConfigModule
 	users     *users.UsersModule
+	lampa     *lampa.LampaModule
 	keychain  *KeyChain
 }
 
@@ -36,6 +38,7 @@ func (m *OtpAuthModule) Init(ctx *core.AppContext, logger *slog.Logger, cfg any)
 	m.Logger = logger
 	m.appConfig = m.Ctx.Modules["app_config"].(*app_config.AppConfigModule)
 	m.users = m.Ctx.Modules["users"].(*users.UsersModule)
+	m.lampa = m.Ctx.Modules["lampa"].(*lampa.LampaModule)
 	m.keychain = NewKeyChain(&KeyChainOptions{
 		Expiration:      m.Config.AuthSessionLifetime,
 		CleanupInterval: m.Config.ExpiredAuthSessionCleanupInterval,

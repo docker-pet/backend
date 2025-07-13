@@ -57,15 +57,15 @@ func main() {
 
 	core.RegisterModule(&users.UsersModule{}, &users.Config{})
 
+	core.RegisterModule(&lampa.LampaModule{}, &lampa.Config{
+		StoragePath: "./generated/lampa",
+	})
+
 	core.RegisterModule(&otp_auth.OtpAuthModule{}, &otp_auth.Config{
 		SessionVerifyInterval:             time.Minute * 7,
 		AuthSessionLifetime:               time.Minute * 5,
 		ExpiredAuthSessionCleanupInterval: time.Minute * 15,
 		MaxPinGenerationAttempts:          10,
-	})
-
-	core.RegisterModule(&lampa.LampaModule{}, &lampa.Config{
-		StoragePath: "./generated/lampa",
 	})
 
 	core.RegisterModule(&telegram_bot.TelegramBotModule{}, &telegram_bot.Config{

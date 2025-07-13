@@ -23,6 +23,14 @@ func (m *OtpAuthModule) registerOtpUserEndpoint() {
 			container.Set(claims.UserRole, "role")
 			container.Set(claims.DeviceName, "deviceName")
 
+			// Lampa
+			withLampa := e.Request.URL.Query().Has("with-lampa")
+			if withLampa {
+				if lampaUser, _ := m.lampa.GetLampaUserByUserId(claims.UserId); lampaUser != nil {
+					container.Set(lampaUser.AuthKey(), "lampaAuthKey")
+				}
+			}
+
 			return e.JSON(http.StatusOK, container.Data())
 		})
 
