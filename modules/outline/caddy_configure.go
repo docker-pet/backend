@@ -15,8 +15,40 @@ import (
 	"resty.dev/v3"
 )
 
+type Token struct {
+	UserId string
+	Token  string
+}
+
+func (m *OutlineModule) configureAll() {
+	servers, err := m.GetAllActiveServers()
+	if err != nil {
+		m.Logger.Warn(
+			"Failed to get all active Outline servers",
+			"Error", err,
+		)
+		return
+	}
+
+	for _, server := range servers {
+		m.configureCaddy(server.Id)
+	}
+}
+
 func (m *OutlineModule) configureCaddy(serverId string) {
-	tokens := m.tokenStore.GetAllByServer(serverId)
+	// Tokens
+	var tokens []*Token
+	if users, _ := m.users.GetAllUsers(); users != nil {
+		for _, user := range users {
+			if user.OutlineToken() != "" && user.IsActive() {
+				tokens = append(tokens, &Token{
+					UserId: user.Id,
+					Token:  user.OutlineToken(),
+				})
+			}
+		}
+	}
+
 	server, err := m.GetServerById(serverId)
 	hasServerChanges := false
 	if err != nil {
@@ -313,7 +345,6 @@ func (m *OutlineModule) GenerateBasicCaddyConfig(server *models.OutlineServer) (
 			domains += fmt.Sprintf(`, "%s"`, reverseDomain)
 		}
 
-
 		return []byte(fmt.Sprintf(`{
 			"admin": {
               "listen": "unix//outline_generated/admin.sock"
@@ -331,7 +362,7 @@ func (m *OutlineModule) GenerateBasicCaddyConfig(server *models.OutlineServer) (
                       {
                         "match": [
                           {
-                            "host": ["%s"]
+                            "host": [%s]
                           }
                         ],
                         "handle": [
@@ -499,7 +530,7 @@ func (m *OutlineModule) generateWebsocket2layer4Route(server *models.OutlineServ
 }
 
 func (m *OutlineModule) hasKeysChanges(config *gabs.Container, tokens []*Token) bool {
-	// Собираем актуальные данные по токенам
+	// Collecting up-to-date data on tokens.
 	tokenInfo := make(map[string]struct {
 		userId string
 		cipher string

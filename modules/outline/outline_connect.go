@@ -98,16 +98,6 @@ func (m *OutlineModule) registerOutlineConnectEndpoint() {
 				server = availableServers[rnd.Intn(len(availableServers))]
 			}
 
-			// Token
-			token, err := m.tokenStore.GetOrGenerate(user.Id, server.Id)
-			if err != nil {
-				return sendError(
-					e,
-					"Failed to generate Outline token",
-					"An error occurred while trying to generate an Outline token for the user.",
-				)
-			}
-
 			// Ports
 			tcpPort := ""
 			udpPort := ""
@@ -138,7 +128,7 @@ func (m *OutlineModule) registerOutlineConnectEndpoint() {
 				{Kind: yaml.ScalarNode, Value: "cipher"},
 				{Kind: yaml.ScalarNode, Value: m.Config.OutlineCipher},
 				{Kind: yaml.ScalarNode, Value: "secret"},
-				{Kind: yaml.ScalarNode, Value: token.Token},
+				{Kind: yaml.ScalarNode, Value: user.OutlineToken()},
 			}
 
 			if outlineConfig.TCP.Prefix != "" && user.OutlinePrefixEnabled() {
@@ -163,7 +153,7 @@ func (m *OutlineModule) registerOutlineConnectEndpoint() {
 				{Kind: yaml.ScalarNode, Value: "cipher"},
 				{Kind: yaml.ScalarNode, Value: m.Config.OutlineCipher},
 				{Kind: yaml.ScalarNode, Value: "secret"},
-				{Kind: yaml.ScalarNode, Value: token.Token},
+				{Kind: yaml.ScalarNode, Value: user.OutlineToken()},
 			}
 
 			if outlineConfig.UDP.Prefix != "" && user.OutlinePrefixEnabled() {

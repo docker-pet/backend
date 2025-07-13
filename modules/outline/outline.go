@@ -2,7 +2,6 @@ package outline
 
 import (
 	"log/slog"
-	"time"
 
 	"github.com/docker-pet/backend/core"
 	"github.com/docker-pet/backend/modules/app_config"
@@ -23,10 +22,6 @@ type Config struct {
 	CaddyCloudflareApiToken string // Is the API token for Cloudflare. If not set, will use a placeholder.
 
 	MetricsProxySecret string // Is the secret for the metrics proxy endpoint. If not set, a new one will be generated (recommended).
-
-	TokenStoreSlidingTTL      time.Duration
-	TokenStoreAbsoluteTTL     time.Duration
-	TokenStoreCleanupInterval time.Duration
 }
 
 type OutlineModule struct {
@@ -36,8 +31,6 @@ type OutlineModule struct {
 
 	users     *users.UsersModule
 	appConfig *app_config.AppConfigModule
-
-	tokenStore *TokenStore
 }
 
 func (m *OutlineModule) Name() string                  { return "outline" }
@@ -49,13 +42,6 @@ func (m *OutlineModule) Init(ctx *core.AppContext, logger *slog.Logger, cfg any)
 	m.Logger = logger
 	m.users = m.Ctx.Modules["users"].(*users.UsersModule)
 	m.appConfig = m.Ctx.Modules["app_config"].(*app_config.AppConfigModule)
-	m.tokenStore = NewTokenStore(
-		m.Config.TokenStoreSlidingTTL,
-		m.Config.TokenStoreAbsoluteTTL,
-		m.Config.TokenStoreCleanupInterval,
-		m.Config.OutlineTechnicalKeyName,
-		m.Config.OutlineTechnicalKeySecret,
-	)
 
 	// Generate metrics proxy secret if not set
 	if m.Config.MetricsProxySecret == "" {
@@ -67,7 +53,7 @@ func (m *OutlineModule) Init(ctx *core.AppContext, logger *slog.Logger, cfg any)
 	m.registerSettingsEndpoint()
 
 	m.watchConfigChanges()
-	m.watchKeysChanges()
+	m.watchUsersChanges()
 
 	m.Logger.Info("Outline module initialized", "Config", m.Config)
 	return nil
