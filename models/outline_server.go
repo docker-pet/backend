@@ -38,6 +38,14 @@ func (a *OutlineServer) SetEnabled(value bool) {
 	a.Set("enabled", value)
 }
 
+func (a *OutlineServer) Autopick() bool {
+	return a.GetBool("autopick")
+}
+
+func (a *OutlineServer) SetAutopick(value bool) {
+	a.Set("autopick", value)
+}
+
 func (a *OutlineServer) Premium() bool {
 	return a.GetBool("premium")
 }

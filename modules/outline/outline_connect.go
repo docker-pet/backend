@@ -94,8 +94,18 @@ func (m *OutlineModule) registerOutlineConnectEndpoint() {
 
 			// Random server
 			if server == nil {
-				rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
-				server = availableServers[rnd.Intn(len(availableServers))]
+				// Filter servers with Autopick enabled
+				autopickServers := make([]*models.OutlineServer, 0)
+				for _, s := range availableServers {
+					if s.Autopick() {
+						autopickServers = append(autopickServers, s)
+					}
+				}
+
+				if len(autopickServers) > 0 {
+					rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
+					server = autopickServers[rnd.Intn(len(autopickServers))]
+				}
 			}
 
 			// Ports
