@@ -106,6 +106,7 @@ func (m *OtpAuthModule) parseCooke(e *core.RequestEvent) *CookieClaims {
 }
 
 func (m *OtpAuthModule) fillCookie(e *core.RequestEvent, claims CookieClaims) {
+	domain := m.getAppDomain(e)
 	expires := time.Now().Add(10 * 365 * 24 * time.Hour)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -129,6 +130,6 @@ func (m *OtpAuthModule) fillCookie(e *core.RequestEvent, claims CookieClaims) {
 		Path:     "/",
 		HttpOnly: true,
 		Expires:  expires,
-		Domain:   "." + m.appConfig.AppConfig().AppDomain(),
+		Domain:   "." + domain,
 	})
 }
