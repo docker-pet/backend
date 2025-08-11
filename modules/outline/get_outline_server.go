@@ -2,7 +2,6 @@ package outline
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/docker-pet/backend/models"
 	"github.com/pocketbase/dbx"
@@ -55,35 +54,21 @@ func proxyServerList(records []*core.Record, err error) ([]*models.OutlineServer
 }
 
 func (m *OutlineModule) formatJobDomain(server *models.OutlineServer) string {
-	domain := server.OverrideDomain()
-
-	if domain != "" && !strings.Contains(domain, ".") {
-    	domain = fmt.Sprintf("%s.%s", domain, m.appConfig.AppConfig().AppDomain())
-	}
-
-	if domain == "" {
-		domain = fmt.Sprintf("%s.%s", server.Slug(), m.appConfig.AppConfig().AppDomain())
-	}
-
-	return domain
+	return fmt.Sprintf("%s.%s", server.Slug(), m.appConfig.AppConfig().AppDomain())
 }
 
 func (m *OutlineModule) formatReverseDomain(server *models.OutlineServer) string {
-	if server.ReverseDomain() == "" {
+	if m.appConfig.AppConfig().AppDomainReverse() == "" {
 		return ""
 	}
 
-	domain := server.ReverseDomain()
-	if domain != "" && !strings.Contains(domain, ".") {
-    	domain = fmt.Sprintf("%s.%s", domain, m.appConfig.AppConfig().AppDomain())
-	}
-
-	return domain
+	return fmt.Sprintf("%s.%s", server.Slug(), m.appConfig.AppConfig().AppDomainReverse())
 }
 
-func (m *OutlineModule) formatConnectDomain(server *models.OutlineServer, user *models.User) string {
-	if user.OutlineReverseServerEnabled() && server.ReverseDomain() != "" {
-		return m.formatReverseDomain(server)
+func (m *OutlineModule) formatConnectDomain(server *models.OutlineServer, domain string) string {
+	reverseDomain := m.formatReverseDomain(server)
+	if domain == m.appConfig.AppConfig().AppDomainReverse() && reverseDomain != "" {
+		return reverseDomain;
 	}
 
 	return m.formatJobDomain(server)

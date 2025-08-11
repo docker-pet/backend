@@ -18,7 +18,8 @@ func (m *UsersModule) NewUser(telegramId int64) (*models.User, error) {
 	user.SetTelegramId(telegramId)
 	user.SetRole(models.RoleGuest)
 	user.SetSynced(types.NowDateTime().AddDate(-20, 0, 0))
-	user.SetOutlinePrefixEnabled(true)
+	user.SetOutlinePrefixEnabled(false)
+	user.SetOutlineReverseServerEnabled(true)
 
 	return user, nil
 }

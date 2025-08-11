@@ -21,6 +21,14 @@ func (a *AppConfig) SetAppDomain(value string) {
 	a.Set("appDomain", value)
 }
 
+func (a *AppConfig) AppDomainReverse() string {
+	return a.GetString("appDomainReverse")
+}
+
+func (a *AppConfig) SetAppDomainReverse(value string) {
+	a.Set("appDomainReverse", value)
+}
+
 func (a *AppConfig) TelegramBotToken() string {
 	return a.GetString("telegramBotToken")
 }

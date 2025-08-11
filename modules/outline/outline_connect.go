@@ -3,6 +3,7 @@ package outline
 import (
 	"fmt"
 	"math/rand"
+	"net"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -25,6 +26,12 @@ func (m *OutlineModule) registerOutlineConnectEndpoint() {
 		se.Router.GET("/api/outline/{userId}/{outlineSecret}", func(e *core.RequestEvent) error {
 			userId := e.Request.PathValue("userId")
 			outlineSecret := e.Request.PathValue("outlineSecret")
+
+			// Connect domain
+			domain, _, err := net.SplitHostPort(e.Request.Host)
+			if err != nil {
+				domain = e.Request.Host
+			}
 
 			// Validate user
 			user, err := m.users.GetUserById(userId)
@@ -132,7 +139,7 @@ func (m *OutlineModule) registerOutlineConnectEndpoint() {
 						{Kind: yaml.ScalarNode, Value: "$type"},
 						{Kind: yaml.ScalarNode, Value: "websocket"},
 						{Kind: yaml.ScalarNode, Value: "url"},
-						{Kind: yaml.ScalarNode, Value: fmt.Sprintf("wss://%s%s/%s", m.formatConnectDomain(server, user), tcpPort, outlineConfig.TCP.Path)},
+						{Kind: yaml.ScalarNode, Value: fmt.Sprintf("wss://%s%s/%s", m.formatConnectDomain(server, domain), tcpPort, outlineConfig.TCP.Path)},
 					},
 				},
 				{Kind: yaml.ScalarNode, Value: "cipher"},
@@ -157,7 +164,7 @@ func (m *OutlineModule) registerOutlineConnectEndpoint() {
 						{Kind: yaml.ScalarNode, Value: "$type"},
 						{Kind: yaml.ScalarNode, Value: "websocket"},
 						{Kind: yaml.ScalarNode, Value: "url"},
-						{Kind: yaml.ScalarNode, Value: fmt.Sprintf("wss://%s%s/%s", m.formatConnectDomain(server, user), udpPort, outlineConfig.UDP.Path)},
+						{Kind: yaml.ScalarNode, Value: fmt.Sprintf("wss://%s%s/%s", m.formatConnectDomain(server, domain), udpPort, outlineConfig.UDP.Path)},
 					},
 				},
 				{Kind: yaml.ScalarNode, Value: "cipher"},

@@ -48,10 +48,7 @@ func init() {
 				continue
 			}
 
-			domain := server.OverrideDomain()
-			if domain == "" {
-				domain = "FILL_ME"
-			}
+			domain := "FILL_ME"
 
 			outlineConfig := &models.OutlineServerSyncRemote{
 				RemoteAdminEndpoint: fmt.Sprintf("https://%s/%s/", domain, server.GetString("servicePath")),

@@ -54,22 +54,6 @@ func (a *OutlineServer) SetPremium(value bool) {
 	a.Set("premium", value)
 }
 
-func (a *OutlineServer) OverrideDomain() string {
-	return a.GetString("overrideDomain")
-}
-
-func (a *OutlineServer) SetOverrideDomain(value string) {
-	a.Set("overrideDomain", value)
-}
-
-func (a *OutlineServer) ReverseDomain() string {
-	return a.GetString("reverseDomain")
-}
-
-func (a *OutlineServer) SetReverseDomain(value string) {
-	a.Set("reverseDomain", value)
-}
-
 func (a *OutlineServer) SyncType() OutlineServerSyncType {
 	return OutlineServerSyncType(a.GetString("syncType"))
 }
