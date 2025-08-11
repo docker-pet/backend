@@ -2,6 +2,7 @@ package otp_auth
 
 import (
 	"fmt"
+	"net"
 	"net/http"
 	"net/url"
 
@@ -18,15 +19,31 @@ func (m *OtpAuthModule) registerOtpVerifyEndpoint() {
 				return e.NoContent(http.StatusOK)
 			}
 
+			// Request domain
+			requestDomain, _, err := net.SplitHostPort(e.Request.Host)
+			if err != nil {
+				requestDomain = e.Request.Host
+			}
+
+			// App Domain (main or reverse)
+			appDomain := m.appConfig.AppConfig().AppDomain()
+			reverseDomain := m.appConfig.AppConfig().AppDomainReverse()
+			redirectDomain := appDomain
+			if reverseDomain != "" && (requestDomain == reverseDomain ||
+				(len(requestDomain) > len(reverseDomain)+1 &&
+					requestDomain[len(requestDomain)-len(reverseDomain)-1:] == "."+reverseDomain)) {
+				redirectDomain = reverseDomain
+			}
+
 			// Redirect to auth page
-			redirectUrl := "https://" + m.appConfig.AppConfig().AppDomain()
+			redirectUrl := "https://" + redirectDomain
 			if e.Request.Header.Get("Remote-Addr") != "" {
 				redirectUrl = "https://" + e.Request.Header.Get("Remote-Addr") + e.Request.Header.Get("Original-URI")
 			}
 
 			return e.Redirect(302, fmt.Sprintf(
 				"https://%s/auth?redirect=%s",
-				m.appConfig.AppConfig().AppDomain(),
+				redirectDomain,
 				url.QueryEscape(redirectUrl),
 			))
 		})
