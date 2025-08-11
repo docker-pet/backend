@@ -21,7 +21,7 @@ func (m *LampaModule) BuildInitConfig() {
 	// Listen
 	container.SetP("https", "listenscheme")
 	container.SetP(80, "listenport")
-	container.SetP(fmt.Sprintf("lampa.%s", m.appConfig.AppConfig().AppDomain()), "listenhost")
+	// container.SetP(fmt.Sprintf("lampa.%s", m.appConfig.AppConfig().AppDomain()), "listenhost")
 
 	// Flags
 	container.SetP(true, "multiaccess")
