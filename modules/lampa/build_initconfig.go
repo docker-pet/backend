@@ -1,7 +1,6 @@
 package lampa
 
 import (
-	"fmt"
 	"path/filepath"
 
 	"github.com/Jeffail/gabs/v2"
